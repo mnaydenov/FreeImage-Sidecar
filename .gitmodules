@@ -1,0 +1,3 @@
+[submodule "external/libheif"]
+	path = external/libheif
+	url = https://github.com/strukturag/libheif
