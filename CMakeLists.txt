@@ -19,11 +19,11 @@ find_package(Libheif REQUIRED)
 #
 
 find_path(
-		FREEIMAGE_INCLUDE_DIR
-		NAMES FreeImage.h
-		PATHS
-      ${FREEIMAGE_HEADER_DIR}
-		DOC "FreeImage.h folder")
+  FREEIMAGE_INCLUDE_DIR
+  NAMES FreeImage.h
+  PATHS
+    ${FREEIMAGE_HEADER_DIR}
+  DOC "FreeImage.h folder")
 
 find_library(
   FREEIMAGE_LIBRARY
@@ -86,13 +86,14 @@ add_library(fisidecar
 ) 
 
 if(${BUILD_SHARED_LIBS})
- target_compile_definitions(fisidecar PUBLIC FREEIMAGE_EXPORTS)
- set_target_properties(fisidecar PROPERTIES 
-   CXX_VISIBILITY_PRESET hidden 
-   POSITION_INDEPENDENT_CODE ON 
-   VISIBILITY_INLINES_HIDDEN ON)
+  target_compile_definitions(fisidecar PUBLIC FREEIMAGE_EXPORTS)
+  set_target_properties(fisidecar PROPERTIES 
+    CXX_VISIBILITY_PRESET hidden 
+    POSITION_INDEPENDENT_CODE ON 
+    VISIBILITY_INLINES_HIDDEN ON
+  )
 else()
- target_compile_definitions(fisidecar PUBLIC FREEIMAGE_LIB)
+  target_compile_definitions(fisidecar PUBLIC FREEIMAGE_LIB)
 endif()
 
 target_include_directories(fisidecar PRIVATE ${CMAKE_SOURCE_DIR}/src ${FREEIMAGE_INCLUDE_DIR} ${LCMS_INCLUDE_DIR})

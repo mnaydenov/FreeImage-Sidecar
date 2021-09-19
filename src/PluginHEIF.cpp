@@ -403,7 +403,7 @@ FIBITMAP* loadFromHimage(heif_image_handle* himage, output_msg_t output_msg)
   // --- get color profile
 
   // Note, we get it from himage, because in real-life photos, img does not have one (libheif issue?)
-  // Also, to have a profile in header only is consitent to the other plugins
+  // Also, to have a profile in header-only is consitent to the other plugins
 
   const auto profile_type = heif_image_handle_get_color_profile_type(himage);
   switch(profile_type)
