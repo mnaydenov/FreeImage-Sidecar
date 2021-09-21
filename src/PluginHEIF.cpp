@@ -298,7 +298,7 @@ FIBITMAP* loadFromHimage(heif_image_handle* himage, output_msg_t output_msg)
 {
   const auto flags = ::flags(output_msg.args);
   const auto isLoadHeaderOnly = flags & FIF_LOAD_NOPIXELS;
-  const auto isLoadForcedSDR = ! flags ? true : flags & FISIDECAR_LOAD_HEIF_SDR;
+  const auto isLoadForcedSDR  = flags & FISIDECAR_LOAD_HEIF_SDR;
 
   using unique_opts = unique_ptr<heif_decoding_options, void (*)(heif_decoding_options*)>;
   using unique_img  = unique_ptr<heif_image, void (*)(const heif_image*)>;
