@@ -131,6 +131,12 @@ bool convertNCLXtoICC(const heif_color_profile_nclx& nclx, void** data, unsigned
 
   cmsToneCurve* const curves[3] {curve, curve, curve};
   if(auto profile = cmsCreateRGBProfile(&whitepoint, &primaries, curves)) {
+
+    auto description = cmsMLUalloc({}, 1);
+    cmsMLUsetASCII(description, "en", "US", "Created from NCLX");
+    cmsWriteTag(profile, cmsSigProfileDescriptionTag, description);
+    cmsMLUfree(description);
+
     cmsUInt32Number size{};
     if(cmsSaveProfileToMem(profile, {}, &size)) {
       *data = malloc(size);
