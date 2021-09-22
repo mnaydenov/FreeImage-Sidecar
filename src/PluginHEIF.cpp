@@ -259,6 +259,7 @@ int flags(Args args) {
 }
 
 #if defined(FI_ADV)
+
 struct Progress
 {
   FIProgress* progress;
@@ -266,6 +267,7 @@ struct Progress
   double last_progress;
   int total_steps;
 };
+
 bool start_progress(enum heif_progress_step step, int max_progress, void* progress_user_data) {
   if(step != heif_progress_step_load_tile)
     return true;
@@ -292,7 +294,7 @@ bool on_progress(enum heif_progress_step step, int tiles_processed, void* progre
   return progress->progress->reportProgress(lerp(progress->first_progress, progress->last_progress, relativeTilesProgress));
 }
 
-#endif
+#endif // FI_ADV
 
 FIBITMAP* loadFromHimage(heif_image_handle* himage, output_msg_t output_msg)
 {
@@ -618,8 +620,13 @@ Load(FreeImageIO* io, fi_handle handle, int page, Args args, void* data)
         if(! progress.reportProgress(decode_end_progress)) {
           return {};
         }
-        output_msg.args = {};     //< clear for thumb
-        output_msg.progress = {}; //< 
+
+        FreeImageLoadArgs thArgs{*args};
+        thArgs.flags &= ~FIF_LOAD_NOPIXELS;
+        output_msg.args = &thArgs; 
+        output_msg.progress = {};  
+#else
+        output_msg.args &= ~FIF_LOAD_NOPIXELS;
 #endif
         auto thumb = loadFromHimage(hthumb, output_msg);
         FreeImage_SetThumbnail(dib, thumb);
