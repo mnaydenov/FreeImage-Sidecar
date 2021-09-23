@@ -104,8 +104,6 @@ bool convertNCLXtoICC(const heif_color_profile_nclx& nclx, void** data, unsigned
 
   using unique_curve = unique_ptr<cmsToneCurve, void(*)(cmsToneCurve*)>;
   cmsToneCurve* curve;
-  unique_curve curve_storage{curve, &cmsFreeToneCurve};
-
   switch (nclx.transfer_characteristics)
   {
   case heif_transfer_characteristic_ITU_R_BT_709_5:
@@ -128,6 +126,7 @@ bool convertNCLXtoICC(const heif_color_profile_nclx& nclx, void** data, unsigned
     static const cmsFloat64Number params[5] = { 2.4, 1.0 / 1.055,  0.055 / 1.055, 1.0 / 12.92, 0.04045 };
     curve = cmsBuildParametricToneCurve ({}, 4, params);
   }
+  unique_curve curve_storage{curve, &cmsFreeToneCurve};
 
   cmsToneCurve* const curves[3] {curve, curve, curve};
   if(auto profile = cmsCreateRGBProfile(&whitepoint, &primaries, curves)) {
