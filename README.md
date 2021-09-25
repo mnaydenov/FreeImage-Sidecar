@@ -46,7 +46,11 @@ There are few new load flags:
 
  - `FISIDECAR_LOAD_HEIF_SDR` - Load 10bit+ images as 8bit. **10bit+ Loading is not implemented yet, so you really want this flag.**
  - `FISIDECAR_LOAD_HEIF_NCLX_TO_ICC` (requires `liblcms2`) - Create ICC profile, reflecting the NCLX information.
- - `FISIDECAR_LOAD_HEIF_TRANSFORM` - Similarly to the existing `JPEG_EXIFROTATE`, this flag will instruct the loader to apply all geometry transformations, described in the file. Also similarly, the metadata might become out of sync because it is not updated to reflect the changes. 
+ - `FISIDECAR_LOAD_HEIF_TRANSFORM` - Similarly to the existing `JPEG_EXIFROTATE`, this flag will instruct the loader to apply all geometry transformations, described in the file. Also similarly, the metadata might become out of sync because it is not updated to reflect the changes. In contrast to `JPEG_EXIFROTATE`, the correct (transformed) dimensions are returned when loading with `FIF_LOAD_NOPIXELS`.  
+
+ ## Metadata support
+
+ The plugin will load EXIF and XMP. Note, however that EXIF is loaded _only_ as "ExifRaw" tag. This means no metadata will be available via the FreeImage usual metadata query routines. The reason for this is simple - FreeImage EXIF parsing is not available (not exported) for external applications to use, including plugins. 
 
  # FreeImage-Adv (optional)
 
