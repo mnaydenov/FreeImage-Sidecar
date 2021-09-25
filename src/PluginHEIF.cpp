@@ -250,7 +250,7 @@ int s_format_id;
 } // namespace a
 
 BOOL DLL_CALLCONV
-SupportsICCProfiles()
+returnTRUE()
 {
   return TRUE;
 }
@@ -672,22 +672,15 @@ InitHEIF(Plugin* plugin, int format_id)
   plugin->format_proc = impl::Format;
   plugin->description_proc = impl::Description;
   plugin->extension_proc = impl::Extension;
-  plugin->regexpr_proc = NULL;
-  plugin->open_proc = NULL;
-  plugin->close_proc = NULL;
-  plugin->pagecount_proc = NULL;
-  plugin->pagecapability_proc = NULL;
 #ifdef FI_ADV
   plugin->loadAdv_proc = Load;
 #else
   plugin->load_proc = Load;
 #endif
-  plugin->save_proc = {};
   plugin->validate_proc = Validate;
   plugin->mime_proc = impl::MimeType;
-  plugin->supports_export_bpp_proc = {};
-  plugin->supports_export_type_proc = {};
-  plugin->supports_icc_profiles_proc = SupportsICCProfiles;
+  plugin->supports_icc_profiles_proc = returnTRUE;
+	plugin->supports_no_pixels_proc = returnTRUE;
 }
 
 void DLL_CALLCONV
@@ -727,20 +720,13 @@ InitAVIF(Plugin* plugin, int format_id)
   plugin->format_proc = impl::Format;
   plugin->description_proc = impl::Description;
   plugin->extension_proc = impl::Extension;
-  plugin->regexpr_proc = NULL;
-  plugin->open_proc = NULL;
-  plugin->close_proc = NULL;
-  plugin->pagecount_proc = NULL;
-  plugin->pagecapability_proc = NULL;
 #ifdef FI_ADV
   plugin->loadAdv_proc = Load;
 #else
   plugin->load_proc = Load;
 #endif
-  plugin->save_proc = {};
   plugin->validate_proc = impl::Validate;
   plugin->mime_proc = impl::MimeType;
-  plugin->supports_export_bpp_proc = {};
-  plugin->supports_export_type_proc = {};
-  plugin->supports_icc_profiles_proc = SupportsICCProfiles;
+  plugin->supports_icc_profiles_proc = returnTRUE;
+  plugin->supports_no_pixels_proc = returnTRUE;
 }
