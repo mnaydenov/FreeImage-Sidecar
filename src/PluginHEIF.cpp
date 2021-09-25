@@ -663,7 +663,7 @@ InitHEIF(Plugin* plugin, int format_id)
     Description() { return "High Efficiency Image File Format (HEIF)"; }
 
     static const char* DLL_CALLCONV
-    Extension() { return "heic,heics,heif"; }
+    Extension() { return "heic,heics,heif,heifs"; }
 
     static const char* DLL_CALLCONV
     MimeType() { return "image/heif"; }
