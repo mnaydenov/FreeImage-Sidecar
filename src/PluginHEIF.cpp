@@ -273,7 +273,7 @@ struct Progress
   int total_steps;
 };
 
-bool start_progress(enum heif_progress_step step, int max_progress, void* progress_user_data) {
+int start_progress(enum heif_progress_step step, int max_progress, void* progress_user_data) {
   if(step != heif_progress_step_load_tile)
     return true;
     
@@ -283,7 +283,7 @@ bool start_progress(enum heif_progress_step step, int max_progress, void* progre
   return true;
 }
 
-bool on_progress(enum heif_progress_step step, int tiles_processed, void* progress_user_data) {
+int on_progress(enum heif_progress_step step, int tiles_processed, void* progress_user_data) {
   if(step != heif_progress_step_load_tile)
     return true;
 

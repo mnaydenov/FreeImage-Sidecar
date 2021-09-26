@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+
 set(BUILD_SHARED_LIBS ON)               #< Default to shared library
 
 #
@@ -27,7 +31,7 @@ find_path(
 
 find_library(
   FREEIMAGE_LIBRARY
-  NAMES freeimage, FreeImage
+  NAMES freeimage FreeImage
   PATHS
     ${FREEIMAGE_LIBRARY_DIR}
   DOC "FreeImage library folder")
@@ -87,11 +91,6 @@ add_library(fisidecar
 
 if(${BUILD_SHARED_LIBS})
   target_compile_definitions(fisidecar PUBLIC FREEIMAGE_EXPORTS)
-  set_target_properties(fisidecar PROPERTIES 
-    CXX_VISIBILITY_PRESET hidden 
-    POSITION_INDEPENDENT_CODE ON 
-    VISIBILITY_INLINES_HIDDEN ON
-  )
 else()
   target_compile_definitions(fisidecar PUBLIC FREEIMAGE_LIB)
 endif()
