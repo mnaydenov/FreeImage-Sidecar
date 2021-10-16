@@ -42,11 +42,14 @@ The library exposes two new functions to initialize the plugins:
 > Both functions must be run as early as possible in your program, after FreeImage library itself is loaded, because they modify its global state.   
 Basically call these right after `FreeImage_Initialise`, in case of static FreeImage library. In case of dynamic FreeImage library, `Initialise` is called internally when the library is loaded. In that case, you can trigger a load by some non-image-loading APIs like `GetVersion` and call the `FISidecar_Register*` function(s) right after that.
 
-There are few new load flags:
+There are few new load options:
 
  - `FISIDECAR_LOAD_HEIF_SDR` - Load 10bit+ images as 8bit. **10bit+ Loading is not implemented yet, so you really want this flag.**
  - `FISIDECAR_LOAD_HEIF_NCLX_TO_ICC` (requires `liblcms2`) - Create ICC profile, reflecting the NCLX information.
  - `FISIDECAR_LOAD_HEIF_TRANSFORM` - Similarly to the existing `JPEG_EXIFROTATE`, this flag will instruct the loader to apply all geometry transformations, described in the file. Also similarly, the metadata might become out of sync because it is not updated to reflect the changes. In contrast to `JPEG_EXIFROTATE`, the correct (transformed) dimensions are returned when loading with `FIF_LOAD_NOPIXELS`.  
+ - Limit the threads, used for loading the image by OR-ing an integer to the flags argument - `flags | 2`. If not set, by default, 4 threads will be used. See `FISidecar.h` for more info.  
+ >`libheif` must be compiled with `#define ENABLE_PARALLEL_TILE_DECODING` to have threaded loading in the first place.
+ It also needs to have `heif_context_set_max_decoding_threads` function present, which is _not_ the case currently. The custom branch in "external" have this patched in. 
 
  ## Metadata support
 
@@ -60,4 +63,4 @@ There are few new load flags:
  >Note, this is not a CMake variable, but a compilie-time define. If you want to pass it via CMake, you can use the `CMAKE_CXX_FLAGS`, setting it to `"-DFI_ADV"`:  
 `cmake -DCMAKE_CXX_FLAGS="-DFI_ADV" <other-cmake-options>`
 
-As of this writing however, `libheif` _has, but does not use_ callbacks. The `FreeImage-Sidecar` project has a `libheif` fork as a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) in its "external" subdirectory. This fork makes use of the callbacks to add _both_ progress monitoring _and_ cancellation to the tiles loading portion of `libheif`. Tile loading is used in all iOS devices (a major HEIF producer) and allows progressive loading of the image as tiles are fetched and decoded separately from one another. **Tile progress report is implemented only for the single-threaded version of `libheif`.** 
+As of this writing however, `libheif` _has, but does not use_ callbacks. The `FreeImage-Sidecar` project has a `libheif` fork as a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) in its "external" subdirectory. This fork makes use of the callbacks to add _both_ progress monitoring _and_ cancellation to the tiles loading portion of `libheif`. Tile loading is used in all iOS devices (a major HEIF producer) and allows progressive loading of the image as tiles are fetched and decoded separately from one another.  
