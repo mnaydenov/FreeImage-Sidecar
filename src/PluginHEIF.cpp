@@ -1,11 +1,12 @@
 #include "PluginHEIF.hpp"
+#include "FISidecar.h"
 #include <cstring>
 #include <cmath> //< std::lerp
 #include <cassert>
 #include "libheif/heif.h"
 #include <iostream>
 #include "Utilities.h"
-#include "FISidecar.h"
+#include <bitset>
 
 #if ! defined(FI_ADV)
 #include "unique_resource.h"
@@ -16,6 +17,16 @@
 #endif
 
 namespace {
+
+template <typename T> 
+auto call_context_set_max_decoding_threads(T* ctx, int max_threads) 
+  -> decltype(heif_context_set_max_decoding_threads(ctx, max_threads)) {
+  return heif_context_set_max_decoding_threads(ctx, max_threads);
+}
+ 
+void call_context_set_max_decoding_threads(...) {
+  // do nothing if heif_context_set_max_decoding_threads() is not present
+}
 
 void addExif(FIBITMAP* dib, const void* data, size_t length) {
 	FITAG* tag = FreeImage_CreateTag();
@@ -263,6 +274,7 @@ int flags(Args args) {
 #endif
 }
 
+
 #if defined(FI_ADV)
 
 struct Progress
@@ -479,6 +491,13 @@ Load(FreeImageIO* io, fi_handle handle, int page, Args args, void* data)
     return format_id;
   }(); //< invoke
 
+  const auto max_threads = [&]{ 
+    std::bitset<FISIDECAR_LOAD_MAXTHREADS_VALUE_SIZE> mask; 
+    mask.set(); 
+    const auto val = ::flags(args) & mask.to_ulong(); 
+    return val ? val : FISIDECAR_LOAD_MAXTHREADS_DEFAULT;
+  }(); //< invoke
+
   auto output_msg = output_msg_t{args, format_id};
 
   try {
@@ -490,6 +509,8 @@ Load(FreeImageIO* io, fi_handle handle, int page, Args args, void* data)
 #endif
     auto* ctx = heif_context_alloc();
     unique_ctx ctx_storage{ctx, &heif_context_free};
+
+    ::call_context_set_max_decoding_threads(ctx, max_threads);
 
     FIIO fio(io, handle);
     FIIO_reader fio_reader;
@@ -559,7 +580,7 @@ Load(FreeImageIO* io, fi_handle handle, int page, Args args, void* data)
             // First 4 bytes are the offset into the block where the data starts
             // (https://github.com/strukturag/libheif/issues/269#issuecomment-667149770)
             const auto size = block.second;
-            const auto* const data = reinterpret_cast<unsigned char*>(block.first.get());
+            const auto* const data = static_cast<unsigned char*>(block.first.get());
             assert(size > 4);
             const auto offset = unsigned(data[0] << 4) | (data[1] << 3) | (data[2] << 2) | data[3];
             
@@ -574,7 +595,7 @@ Load(FreeImageIO* io, fi_handle handle, int page, Args args, void* data)
 
               const auto sizeofSig = sizeof("Exif\0\0") - 1;
               const auto new_size = sizeofSig + (size - (4 + offset));
-              const auto new_data = reinterpret_cast<unsigned char*>(malloc(new_size));
+              const auto new_data = static_cast<unsigned char*>(malloc(new_size));
 
               if(! new_data) {
                 output_msg("Out of memory for %s block", type.c_str()); 
