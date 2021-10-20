@@ -2,3 +2,7 @@
 	path = external/libheif
 	url = https://github.com/mnaydenov/libheif.git
 	branch = tiles-progress-next
+[submodule "external/VTFLib"]
+	path = external/VTFLib
+	url = https://github.com/mnaydenov/VTFLib.git
+	branch = dev
