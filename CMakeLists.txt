@@ -12,6 +12,12 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 set(BUILD_SHARED_LIBS ON)               #< Default to shared library
 
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+
+add_library(pluginheif OBJECT 
+  "src/PluginHEIF.cpp"
+)
+
 #
 # find libheif
 #
@@ -46,37 +52,13 @@ endif()
 
 #
 # (optional) 
-# find lcms2, the KISS way - either look into INSTALL_PREFIX or let the user point to header and library
+# find lcms2
 #
 
-find_path(
-		LCMS_INCLUDE_DIR
-		NAMES lcms2.h
-		PATHS
-      "${LCMS_HEADER_DIR}" "${CMAKE_INSTALL_PREFIX}/include"
-		DOC "lcms2.h folder")
+find_package(LCMS2 QUIET)
 
-find_library(
-  LCMS_LIBRARY
-  NAMES lcms2
-  PATHS
-    "${CMAKE_INSTALL_PREFIX}/lib" "${LCMS_LIBRARY_DIR}"
-  DOC "lcms2 library folder")
-
-if(NOT LCMS_INCLUDE_DIR)
-  message("lcms2.h not found in:\n LCMS_HEADER_DIR (${LCMS_HEADER_DIR})\n CMAKE_INSTALL_PREFIX/include (${CMAKE_INSTALL_PREFIX})")
-endif()
-
-if(NOT LCMS_LIBRARY)
-  message("lcms2 library not found in:\n LCMS_LIBRARY_DIR (${LCMS_LIBRARY_DIR})\n CMAKE_INSTALL_PREFIX/lib (${CMAKE_INSTALL_PREFIX}) ")
-endif()
-
-add_library(pluginheif OBJECT 
-  "src/PluginHEIF.cpp"
-)
-
-if(NOT LCMS_INCLUDE_DIR OR NOT LCMS_LIBRARY)
-  message("\n NCLX to ICC color profile conversion will be unavailable.")
+if(NOT LCMS2_FOUND)
+  message("\n NO LCMS2, NCLX to ICC color profile conversion will be unavailable.")
 else()
   target_compile_definitions(pluginheif PRIVATE FISIDECAR_HAS_LCMS)
 endif()
