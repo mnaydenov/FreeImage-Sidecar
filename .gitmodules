@@ -1,3 +1,4 @@
 [submodule "external/libheif"]
 	path = external/libheif
-	url = https://github.com/strukturag/libheif
+	url = https://github.com/mnaydenov/libheif.git
+	branch = tiles-progress-next
