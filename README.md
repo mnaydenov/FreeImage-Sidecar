@@ -15,20 +15,9 @@ _Explicitly point to both header and library._
 
 **optional**
 
-HEIF and AVIF sometimes come with NCLX color information. In order to create ICC profiles from these, [liblcms2](https://www.littlecms.com/) is used. This library also does not use CMake modules, but can be installed. This is why an attempt is made to first look for it into `CMAKE_INSTALL_PREFIX`.  
+HEIF and AVIF sometimes come with NCLX color information. In order to create ICC profiles from these, [liblcms2](https://www.littlecms.com/) is used. The library also does not use CMake modules, but can be installed. An attempt is made to look for it using a basic `FindLCMS2.cmake` which tries to `find_path` `"lcms2.h"` and `find_library` `"lcms2"` in the default locations.  
 
-```bash
-cmake -S <path-to-source> -B <path-to-binaries> -DCMAKE_INSTALL_PREFIX="path-to-your-install-prefix"
-```
-_Use explicit install prefix. Otherwise defaults to `/usr/local` on UNIX and `c:/Program Files/${PROJECT_NAME}` on Windows._  
-
-If this fails, the lookup is the same as with FreeImage and `LCMS_HEADER_DIR` and `LCMS_LIBRARY_DIR` are searched for the header and the library respectively. 
-```bash
-cmake -S <path-to-source> -B <path-to-binaries> -DLCMS_HEADER_DIR="path-to-lcms2-header-folder" -DLCMS_LIBRARY_DIR="path-to-lcms2-library-folder"
-```
-_Point to both header and library._
-
-If you opt-out from using `liblcms2` the NCLX color information will be lost, resulting of somewhat incorrect colors. 
+If the search fails, `liblcms2` will not be used and the NCLX color information will be lost, resulting of somewhat incorrect colors. 
 
 # How to use
 
@@ -39,7 +28,7 @@ The library exposes two new functions to initialize the plugins:
  - `FISidecar_RegisterPluginHEIF` will register the HEIF plugin and return the `FREE_IMAGE_FORMAT` for it.
  - `FISidecar_RegisterPluginAVIF` will register the AVIF plugin and return the `FREE_IMAGE_FORMAT` for it.
 
-> Both functions must be run as early as possible in your program, after FreeImage library itself is loaded, because they modify its global state.   
+> Both functions must be run as early as possible in your program, after FreeImage library itself is initialized, because they modify its global state.   
 Basically call these right after `FreeImage_Initialise`, in case of static FreeImage library. In case of dynamic FreeImage library, `Initialise` is called internally when the library is loaded. In that case, you can trigger a load by some non-image-loading APIs like `GetVersion` and call the `FISidecar_Register*` function(s) right after that.
 
 There are few new load options:
